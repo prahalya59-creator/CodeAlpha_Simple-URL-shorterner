@@ -1,4 +1,4 @@
-from flask import Flask,request,jsonify
+from flask import Flask,request,jsonify,redirect
 from models import db,URL
 import random
 import string
@@ -11,7 +11,7 @@ db.init_app(app)
 def generate_code():
     return ''.join(
         random.choices(
-            string.ascii_letters+strings.digits,
+            string.ascii_letters+string.digits,
             k=6
         )
     )
@@ -40,6 +40,31 @@ def shorten():
         "short_url":
         f"http://127.0.0.1:5000/{code}"
     })
+@app.route('/test')
+def test():
+
+    code = generate_code()
+
+    new_url = URL(
+        original_url="https://google.com",
+        short_code=code
+    )
+
+    db.session.add(new_url)
+    db.session.commit()
+
+    return f"http://127.0.0.1:5000/{code}"
+@app.route('/<code>')
+def redirect_url(code):
+
+    url = URL.query.filter_by(
+        short_code=code
+    ).first()
+
+    if url:
+        return redirect(url.original_url)
+
+    return "URL Not Found"
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
