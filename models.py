@@ -2,6 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
+
 class URL(db.Model):
 
     id = db.Column(
@@ -15,7 +16,12 @@ class URL(db.Model):
     )
 
     short_code = db.Column(
-        db.String(10),
+        db.String(50),
         unique=True,
         nullable=False
+    )
+
+    clicks = db.Column(
+        db.Integer,
+        default=0
     )
